@@ -17,12 +17,12 @@ There is `send-push` command to send single push notification.
 
 For GCM:
 ```
-php console send-push ios 3610ddea5e97b690b1a17247c11c4483264a72cbc8376e52f0fecedba64b7a03 -p /some/dir/path/certificate.pem
+php PushTester.phar send-push apns 3610ddea5e97b690b1a17247c11c4483264a72cbc8376e52f0fecedba64b7a03 -p /some/dir/path/certificate.pem
 ```
 
 For APNS:
 ```
-php console send-push android APA91bG7VgdMs1Bvi1uNSjHvH6sXUx_gvzHm-zwPXOcUgcECYv198256tmQz1aJ6l2QiI3z9bbBkRURmqvn8gs-PUPNvfQlm8QOZ5JYHBZFXyK2d0ZV1nn9-O8PLcdJWEYeIrQK6I7aZ -g "J79asdfklas-fj98DSFd8of04fm3lk4f89ksdjf"
+php PushTester.phar send-push gcm APA91bG7VgdMs1Bvi1uNSjHvH6sXUx_gvzHm-zwPXOcUgcECYv198256tmQz1aJ6l2QiI3z9bbBkRURmqvn8gs-PUPNvfQlm8QOZ5JYHBZFXyK2d0ZV1nn9-O8PLcdJWEYeIrQK6I7aZ -g "J79asdfklas-fj98DSFd8of04fm3lk4f89ksdjf"
 ```
 
 Build new release

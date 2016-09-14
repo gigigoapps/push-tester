@@ -1,123 +1,76 @@
 <?php
 namespace PushTester\Push;
 
-use PushTester\Push\Gateway\Gcm;
-use PushTester\Push\Gateway\Ios;
+use PushTester\Push\Gateway\GcmGateway;
+use PushTester\Push\Gateway\ApnsGateway;
 
 /**
- * Clase encargada de enviar notificaciones push para ios y android
- * @author gigigo
+ * Class to send push to selected service
  */
-class NotificationPush {
-
+class NotificationPush
+{
+    private $platform;
+    private $auth;
     private $devices;
     private $message;
-    private $sound;
-    private $gateway;
-    private $urlGatewayAndroid;
-    private $urlGatewayIos;
-    private $gcmtoken;
-    private $iosPemFile;
     private $badge;
     private $typeAlert;
+    private $sound;
 
-    /**
-     * Contructor
-     * @param StdClass $config
-     */
-    public function __construct($config) {
+    public function __construct($platform, $auth)
+    {
+        $this->platform = strtolower($platform);
+        $this->auth = $auth;
+
+        $this->message = 'Test message';
         $this->badge = 1;
-        $this->devices = array();
-        $this->urlGatewayAndroid = $config['android'];
-        $this->urlGatewayIos = $config['ios'];
-        $this->gcmtoken = $config['gcmToken'];
-        $this->iosPemFile = $config['iosPemFile'];
+        $this->devices = [];
     }
 
     /**
-     * NotificacionToken del dispositivo a enviar
-     * @param unknown $notificationToken
+     * Add a device notification token
+     *
+     * @param string $notificationToken
      */
-    public function addNotificationToken($notificationToken) {
+    public function addNotificationToken($notificationToken)
+    {
         $this->devices[] = $notificationToken;
     }
 
     /**
-     * Texto message de la notificacion push
-     * @param String $message
+     * @param array $data
+     *  - message: string optional
+     *  - typeAlert: string optional
+     *  - sound: string optional
+     *  - badge: int optional
+     * @return string
+     * @throws \Exception
      */
-    public function setMessage($message) {
-        $this->message = $message;
-    }
-
-    /**
-     * Sonido para la notificacion push
-     * @param String $sound
-     */
-    public function setSound($sound) {
-        $this->sound = $sound;
-    }
-
-    /**
-     * Badge para la notificacion push
-     * @param String $sound
-     */
-    public function setBadge($badge) {
-        $this->badge = $badge;
-    }
-
-    /**
-     * Puerta de enlace para el envio de la notificacion push
-     *   Valores posibles:
-     *     - android
-     *     - ios
-     * @param String $gateway
-     */
-    public function setGateway($gateway) {
-        $this->gateway = strtolower($gateway);
-    }
-        
-    public function setTypeAlert($typeAlert) {
-        $this->typeAlert = $typeAlert;
-    }
-
-    /**
-     * Envia la notificacion push
-     */
-    public function send()
+    public function send(array $data)
     {
-        // Preparar el objecto data para entregarselo al gateway
-        $data = new \stdClass();
-        $data->message = $this->message;
-        $data->typeAlert = $this->typeAlert;
-        $data->technology = $this->gateway;
-        $data->sound = $this->sound;
-        $data->devices = $this->devices;
-        $data->badge = $this->badge;
+        $data = [
+            'platform'  => $this->platform,
+            'devices'   => $this->devices,
+            'message'   => isset($data['message']) ? $data['message'] : $this->message,
+            'typeAlert' => isset($data['typeAlert']) ? $data['typeAlert'] : $this->typeAlert,
+            'sound'     => isset($data['sound']) ? $data['sound'] : $this->sound,
+            'badge'     => isset($data['badge']) ? $data['badge'] : $this->badge,
+        ];
 
-        $response = null;
-        switch ($this->gateway) {
-            case "android" :
-                // Preparar los objectos gcm y data para entregarselo al gateway
-                $gcm = new \stdClass();
-                $gcm->gateway = $this->urlGatewayAndroid;
-                $gcm->gcmtoken = $this->gcmtoken;
-
-                // Envio de la notificacion push
-                $gcm = new Gcm($gcm);
-                $response = $gcm->send($data);
+        $gateway = null;
+        switch ($this->platform) {
+            case GcmGateway::platform():
+                $gateway = new GcmGateway(['auth' => $this->auth]);
                 break;
-            case "ios" :
-                $ios = new \stdClass();
-                $ios->gateway = $this->urlGatewayIos;
-                $ios->iosPemFile = $this->iosPemFile;
 
-                // Envio de la notificacion push
-                $apns = new Ios($ios);
-                $response = $apns->send($data);
+            case ApnsGateway::platform():
+                $gateway = new ApnsGateway(['auth' => $this->auth]);
                 break;
+
+            default:
+                throw new \Exception("Gateway provided \"{$this->platform}\" not valid");
         }
 
-        return $response;
+        return $gateway->send($data);
     }
 }

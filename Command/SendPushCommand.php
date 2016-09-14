@@ -2,6 +2,8 @@
 
 namespace PushTester\Command;
 
+use PushTester\Push\Gateway\ApnsGateway;
+use PushTester\Push\Gateway\GcmGateway;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -11,15 +13,13 @@ use PushTester\Push\NotificationPush;
 
 class SendPushCommand extends Command
 {
-    const GATEWAY_IOS = "tls://gateway.push.apple.com";
-    const GATEWAY_ANDROID = "https://android.googleapis.com/gcm/send";
-
     protected function configure()
     {
         $this->setName("send-push")
             ->setDescription("Send new push")
             ->addArgument('platform', InputArgument::REQUIRED, 'Platform to send')
             ->addArgument('token', InputArgument::REQUIRED, 'Device token')
+            ->addOption('message', 'm', InputOption::VALUE_REQUIRED, 'Message to send', null)
             ->addOption('gcm-token', 'g', InputOption::VALUE_REQUIRED, 'GCM token', '')
             ->addOption('pem-file', 'p', InputOption::VALUE_REQUIRED, 'APNS PEM file', '')
         ;
@@ -30,38 +30,48 @@ class SendPushCommand extends Command
         $options = [
             'platform'  => strtolower($input->getArgument('platform')),
             'token'     => $input->getArgument('token'),
+            'message'   => $input->getOption('message'),
             'gateway'   => [
-                'android'   => self::GATEWAY_ANDROID,
-                'ios'       => self::GATEWAY_IOS,
-                'gcmToken'  => $input->getOption('gcm-token'),
-                'iosPemFile' => $input->getOption('pem-file')
+                GcmGateway::platform()  => $input->getOption('gcm-token'),
+                ApnsGateway::platform() => $input->getOption('pem-file')
             ]
         ];
 
-        $this->processPush($options);
+        $validPlatforms = array_keys($options['gateway']);
+
+        if (! in_array($options['platform'], $validPlatforms)) {
+            throw new \Exception("Invalid provided platform \"{$options['platform']}\". Only are valid: ".implode(', ', $validPlatforms));
+        }
+
+        $result = $this->processPush($options);
+
+        $output->writeln("<info>$result</info>");
     }
 
     /**
-     * @param $data
-     * @return bool
+     * @param array $options
+     *  - platform: string
+     *  - gateway: array
+     *      - gcm: string
+     *      - apns: string
+     *  - message: string
+     *  - token: string
+     * @return string
      */
     private function processPush(array $options)
     {
         $platform = $options['platform'];
+        $auth = $options['gateway'][$platform];
         $token = $options['token'];
-        $gateway = $options['gateway'];
 
-        $np = new NotificationPush($gateway);
-        $np->setMessage('Test message');
-        $np->setTypeAlert('Alert');
-        $np->setGateway($platform);
-        /*if (array_key_exists('sound', $data['message'])) {
-            $np->setSound($data['message']['sound']);
-        }*/
-
-        // add notification token to NotificationPush object
+        $np = new NotificationPush($platform, $auth);
         $np->addNotificationToken($token);
 
-        return $np->send();
+        $data = [];
+        if (isset($options['message'])) {
+            $data['message'] = $options['message'];
+        }
+
+        return $np->send($data);
     }
 }
