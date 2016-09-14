@@ -1,8 +1,21 @@
 {
+    "name": "gigigoapps/push-tester",
+    "description": "Command line application to send push notifications",
+    "keywords": ["push", "push notification", "gcm", "apns", "push tester"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Blas Castellano Moreno",
+            "email": "b.castellano.moreno@gmail.com",
+            "homepage": "https://github.com/bcastellano"
+        }
+    ],
     "autoload": {
         "psr-4": { "PushTester\\": "./" }
     },
     "require": {
+        "php": ">=5.4",
+        "ext-curl": "*",
         "symfony/console": "^3.1"
     }
 }
