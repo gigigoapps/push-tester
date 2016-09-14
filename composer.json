@@ -1,0 +1,8 @@
+{
+    "autoload": {
+        "psr-4": { "PushTester\\": "./" }
+    },
+    "require": {
+        "symfony/console": "^3.1"
+    }
+}

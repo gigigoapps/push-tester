@@ -1,0 +1,15 @@
+#!/usr/bin/env php
+<?php
+
+namespace PushTester;
+
+require __DIR__.'/vendor/autoload.php';
+
+use Symfony\Component\Console\Application;
+use PushTester\Command\SendPushCommand;
+
+$application = new Application();
+
+$application->add(new SendPushCommand());
+
+$application->run();
