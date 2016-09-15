@@ -6,8 +6,38 @@ Console application to send push notifications to GCM and APNS.
 
 Installing
 ----------
+To install application as executable:
 
-TODO
+### Linux and Mac OS X
+
+```bash
+$ sudo curl -LsS https://github.com/gigigoapps/push-tester/releases/download/latest/PushTester.phar -o /usr/local/bin/PushTester
+$ sudo chmod a+x /usr/local/bin/PushTester
+```
+
+### Windows
+
+```bash
+c:\> php -r "file_put_contents('PushTester', file_get_contents('https://github.com/gigigoapps/push-tester/releases/download/latest/PushTester.phar'));"
+```
+
+Move the downloaded `PushTester` file to your projects directory and execute
+it as follows:
+
+```bash
+c:\> php PushTester
+```
+
+If you prefer to create a global `PushTester` command, execute the following:
+
+```bash
+c:\> (echo @ECHO OFF & echo php "%~dp0PushTester" %*) > PushTester.bat
+```
+
+Then, move both files (`PushTester` and `PushTester.bat`) to any location included
+in your execution path. Now you can run the `PushTester` command anywhere on your
+system.
+
 
 Using
 -----
