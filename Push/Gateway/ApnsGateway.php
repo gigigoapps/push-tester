@@ -7,6 +7,9 @@ class ApnsGateway implements GatewayInterface
     const GATEWAY_URL = "tls://gateway.push.apple.com";
     const GATEWAY_PORT = 2195;
 
+    /**
+     * @var string|null Pem file to authenticate against APNS service
+     */
     protected $auth = null;
 
     /**
@@ -46,11 +49,11 @@ class ApnsGateway implements GatewayInterface
             ]
         ]);
 
-
         $stream_context = stream_context_create();
         stream_context_set_option($stream_context, 'ssl', 'local_cert', $this->auth);
         $apnsSocket = stream_socket_client(self::GATEWAY_URL.':'.self::GATEWAY_PORT, $error, $errorString, 5, STREAM_CLIENT_ASYNC_CONNECT, $stream_context);
 
+        // send push for each device token
         foreach ($data['devices'] as $key => $result) {
             $apnsMessage = chr(0) . chr(0) . chr(32) . pack('H*', str_replace(' ', '', $data['devices'][$key])) . chr(0) . chr(strlen($payload)) . $payload;
 
@@ -59,6 +62,6 @@ class ApnsGateway implements GatewayInterface
             }
         }
 
-        return "IOS Notificaciones Push: [OK]";
+        return "APNS push notification: [OK]";
     }
 }

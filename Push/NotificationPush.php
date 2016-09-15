@@ -1,20 +1,34 @@
 <?php
+
 namespace PushTester\Push;
 
-use PushTester\Push\Gateway\GcmGateway;
 use PushTester\Push\Gateway\ApnsGateway;
+use PushTester\Push\Gateway\GcmGateway;
 
 /**
  * Class to send push to selected service
  */
 class NotificationPush
 {
+    /** @var string Gateway platform key */
     private $platform;
+
+    /** @var mixed Auth method for gateway */
     private $auth;
+
+    /** @var array Device token list */
     private $devices;
+
+    /** @var string Message for push */
     private $message;
+
+    /** @var int Badge for push */
     private $badge;
+
+    /** @var string Type alert for push */
     private $typeAlert;
+
+    /** @var string Sound for push */
     private $sound;
 
     public function __construct($platform, $auth)

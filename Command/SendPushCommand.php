@@ -4,12 +4,12 @@ namespace PushTester\Command;
 
 use PushTester\Push\Gateway\ApnsGateway;
 use PushTester\Push\Gateway\GcmGateway;
+use PushTester\Push\NotificationPush;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use PushTester\Push\NotificationPush;
 
 class SendPushCommand extends Command
 {
@@ -17,6 +17,14 @@ class SendPushCommand extends Command
     {
         $this->setName("send-push")
             ->setDescription("Send new push")
+            ->setHelp(<<<HELP
+
+This <info>send-push</info> command sends push notification.
+
+  <info>console send-push [-m|--message MESSAGE] [-g|--gcm-token GCM-TOKEN] [-p|--pem-file PEM-FILE] [--] <platform> <token></info>
+
+HELP
+            )
             ->addArgument('platform', InputArgument::REQUIRED, 'Platform to send')
             ->addArgument('token', InputArgument::REQUIRED, 'Device token')
             ->addOption('message', 'm', InputOption::VALUE_REQUIRED, 'Message to send', null)

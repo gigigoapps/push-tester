@@ -6,6 +6,9 @@ class GcmGateway implements GatewayInterface
 {
     const GATEWAY_URL  = "https://android.googleapis.com/gcm/send";
 
+    /**
+     * @var string|null GCM token to authenticate against GCM service
+     */
     protected $auth = null;
 
     /**
@@ -77,13 +80,13 @@ class GcmGateway implements GatewayInterface
                 throw new \Exception("Unauthorized [ERROR 401]");
 
             } else if ($message === null) {
-                throw new \Exception("No response [ERROR A]");
+                throw new \Exception("No response [ERROR]");
 
             } else if ($message->success == 0) {
-                throw new \Exception("No send push notifications [ERROR B]");
+                throw new \Exception("No send push notifications [ERROR A]");
 
             } else if ($message->failure > 0) {
-                throw new \Exception("Push notifications [ERROR]");
+                throw new \Exception("No send push notifications [ERROR B]");
 
             } else if ($message->success > 0) {
                 $result = "Push notifications [OK]";
