@@ -5,13 +5,15 @@ namespace PushTester;
 
 require __DIR__.'/vendor/autoload.php';
 
-use Symfony\Component\Console\Application;
+use PushTester\Command\SelfUpdateCommand;
 use PushTester\Command\SendPushCommand;
+use Symfony\Component\Console\Application;
 
 $appVersion = '1.0.0';
 
 $application = new Application('Push tester', $appVersion);
 
 $application->add(new SendPushCommand());
+$application->add(new SelfUpdateCommand());
 
 $application->run();
